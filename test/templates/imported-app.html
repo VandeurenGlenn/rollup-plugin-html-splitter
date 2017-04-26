@@ -1,0 +1,15 @@
+<link rel="import" href="imported2.html">
+
+<template id="imported-app">
+  <h1>hello world</h1>
+</template>
+
+<script>
+import Deep from './deep/deep.js';
+export default Backed(class ImportedApp extends imported2 {
+  ready() {
+    new Deep()
+    console.log('hello world');
+  }
+});
+</script>
