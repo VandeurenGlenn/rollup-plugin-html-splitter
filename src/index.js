@@ -44,17 +44,8 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
         if (output.bundle)
           if (output.bundle.scripts && output.bundle.scripts[id])
             resolve(output.bundle.scripts[id]);
-          else if (output.bundle.virtualSet && output.bundle.virtualSet[id])
-            resolve(output.bundle.virtualSet[id]);
-        else {
-          let cwd = path.join(process.cwd(), path.dirname(entry));
-          readFile(path.join(cwd, id), 'utf-8', (error, contents) => {
-            if (error) {
-              reject(error)
-            }
-  					resolve(contents);
-  				});
-        }
+          else if (output.bundle.imports && output.bundle.imports[id])
+            resolve(output.bundle.imports[id]);
       });
     },
 
