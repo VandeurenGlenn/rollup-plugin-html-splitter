@@ -50,9 +50,9 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
     },
 
     onwrite(options) {
-      options.dest = options.dest.replace('.html', '.js');
-      options.bundle.write(options);
       const href = path.join(path.dirname(options.dest), output.bundle.bundleHref)
+      options.dest = href.replace('.html', '.js');
+      options.bundle.write(options);
       bundler.write(options.dest.replace('.js', '.html'), output.bundle.index);
       bundler.write(href, output.bundle.app);
       bundler.write(href.replace('.html', '.css'), output.bundle.css);
