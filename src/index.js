@@ -2,17 +2,36 @@
 import { createFilter } from 'rollup-pluginutils';
 import bundler from './bundler';
 import { readFile } from 'fs';
-import path from 'path';
+import { join, dirname, basename } from 'path';
 
 export default ({bundleHtml = true, include = null, exclude = ['node_modules']}) => {
 
   const output = {
-    bundle: {}
+    bundle: {},
+    bundled: ''
   };
 
+  const bundlePath = (path, dest) => {
+    return join(dirname(path), dest, basename(path));
+  }
+
+  const bundledPath = path => {
+    console.log(bundlePath(path, 'bundled'));
+    return bundlePath(path, 'bundled');
+  }
+
+  const unBundledPath = path => {
+    console.log(bundlePath(path, 'unbundled'));
+    return bundlePath(path, 'unbundled');
+  }
+
   // merge include, exclude
-  const filter = createFilter(include, exclude)
+  const filter = createFilter(include, exclude);
+
+  let bundled;
+  let unbundled;
   let entry;
+  let written = false;
 
   return {
 
@@ -21,6 +40,8 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
     options(options) {
       entry = options.entry.replace('.html', '.js');
       options.entry = entry;
+      bundled = options.bundled || true;
+      unbundled = options.unbundled || true;
 
       // return options;
     },
@@ -50,12 +71,25 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
     },
 
     onwrite(options) {
-      const href = path.join(path.dirname(options.dest), output.bundle.bundleHref)
+      const _dest = options.dest;
+      const href = unBundledPath(join(dirname(options.dest), output.bundle.bundleHref));
       options.dest = href.replace('.html', '.js');
-      options.bundle.write(options);
-      bundler.write(options.dest.replace('.js', '.html'), output.bundle.index);
-      bundler.write(href, output.bundle.app);
-      bundler.write(href.replace('.html', '.css'), output.bundle.css);
+      if (!written) {
+				written = true;
+
+        options.bundle.write(options);
+        output.bundled = bundler.bundle({index: output.bundle.index, app: output.bundle.app, css: output.bundle.css, js: output.bundle.js});
+
+        if (bundled) {
+          bundler.write(bundledPath(_dest), output.bundled);
+        }
+
+        if (unbundled) {
+          bundler.write(unBundledPath(_dest), output.bundle.index);
+          bundler.write(href, output.bundle.app);
+          bundler.write(href.replace('.html', '.css'), output.bundle.css);
+        }
+      }
     }
   }
 }

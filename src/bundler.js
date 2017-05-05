@@ -1,22 +1,27 @@
 'use strict';
-import { readFile, writeFile } from 'fs';
+import { readFile, writeFile, mkdir } from 'fs';
 import splitter from 'backed-splitter';
+import _bundle from 'backed-bundler';
+import { dirname } from 'path';
 
 let virtualSet = {}
 
 const promiseWrite = (dest, content) => {
-  writeFile(dest, content, error => {
-    if (error) throw console.error(error);
-    return;
-  });
 }
 
 const write = (dest = null, contents = null) => {
-  async function runWrite(dest, contents) {
-    await promiseWrite(dest, contents);
-    return;
-  }
-  return runWrite(dest, contents);
+  return new Promise((resolve, reject) => {
+    writeFile(dest, contents, error => {
+      if (error)
+        if (error.code === 'ENOENT')
+        mdir(dirname(dest), error => {
+          if (error) reject(error);
+          else return promiseWrite(dest, contents);
+        });
+        else reject(error);
+      resolve();
+    });
+  });
 }
 
 const split = (entry = null) => {
@@ -36,7 +41,18 @@ const split = (entry = null) => {
   });
 }
 
+/**
+ * Bundle html
+ */
+const bundle = ({index = null, app = null, js = null, css = null}) => {
+  return `<!DOCTYPE html>
+  <html>
+    ${_bundle({entry: index, html: app, js: js, css: css})}
+</html>`;
+}
+
 export default {
+  bundle: bundle,
   split: split,
   write: write
 }
