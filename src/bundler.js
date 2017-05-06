@@ -14,7 +14,7 @@ const write = (dest = null, contents = null) => {
     writeFile(dest, contents, error => {
       if (error)
         if (error.code === 'ENOENT')
-        mdir(dirname(dest), error => {
+        mkdir(dirname(dest), error => {
           if (error) reject(error);
           else return promiseWrite(dest, contents);
         });
