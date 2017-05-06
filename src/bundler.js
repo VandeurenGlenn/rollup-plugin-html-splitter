@@ -45,9 +45,10 @@ const split = (entry = null) => {
  * Bundle html
  */
 const bundle = ({index = null, app = null, js = null, css = null}) => {
+  const bun = _bundle({entry: index, html: app, js: js, css: css})
   return `<!DOCTYPE html>
   <html>
-    ${_bundle({entry: index, html: app, js: js, css: css})}
+    ${bun}
 </html>`;
 }
 
