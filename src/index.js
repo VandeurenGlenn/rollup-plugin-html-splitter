@@ -16,14 +16,20 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
   }
 
   const bundledPath = path => {
-    console.log(bundlePath(path, 'bundled'));
     return bundlePath(path, 'bundled');
   }
 
   const unBundledPath = path => {
-    console.log(bundlePath(path, 'unbundled'));
     return bundlePath(path, 'unbundled');
   }
+
+	const transformIndex = (source, href, css, js) => {
+		if (css) source = source.replace(/\n(.*)<link rel="stylesheet" href="(.*)">/g, '');
+		source = source.replace(/\n(.*)<link rel="import" href="(.*)">/g, '');
+		if (js) source = source.replace(/\n(.*)<script src="(.*)"><\/script>/g, '');
+
+		return source
+	}
 
   // merge include, exclude
   const filter = createFilter(include, exclude);
@@ -32,7 +38,7 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
   let unbundled;
   let entry;
   let written = false;
-
+  let writ = 0
   return {
 
     name: 'htmlBundler',
@@ -71,24 +77,32 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
     },
 
     onwrite(options) {
-      const _dest = options.dest;
-      const href = unBundledPath(join(dirname(options.dest), output.bundle.bundleHref));
-      options.dest = href.replace('.html', '.js');
+      // options.dest = options.dest.replace('.html', '.js');
       if (!written) {
-				written = true;
-
-        options.bundle.write(options);
-        output.bundled = bundler.bundle({index: output.bundle.index, app: output.bundle.app, css: output.bundle.css, js: output.bundle.js});
-
-        if (bundled) {
-          bundler.write(bundledPath(_dest), output.bundled);
-        }
-
-        if (unbundled) {
-          bundler.write(unBundledPath(_dest), output.bundle.index);
-          bundler.write(href, output.bundle.app);
-          bundler.write(href.replace('.html', '.css'), output.bundle.css);
-        }
+				let href = unBundledPath(join(dirname(options.dest), output.bundle.bundleHref));
+	      let _dest = options.dest;
+        written = true;
+	        if (unbundled) {
+						options.bundle.write({dest: href.replace('.html', '.js'), format: options.format, moduleName: options.moduleName});
+	        // options.bundle.write(options);
+	          bundler.write(unBundledPath(_dest), output.bundle.index);
+	          bundler.write(href, output.bundle.app);
+	          bundler.write(href.replace('.html', '.css'), output.bundle.css);
+	        }
+					if (bundled) {
+		       return options.bundle.write({dest: options.dest, format: options.format, moduleName: options.moduleName}).then(() => {
+             return new Promise((resolve, reject) => {
+               return readFile(options.dest, 'utf-8', (error, contents) => {
+                 if (error) reject(error);
+                 output.bundled = bundler.bundle({index: output.bundle.index, app: output.bundle.app, css: output.bundle.css, js: contents});
+                 transformIndex(output.bundled, href, Boolean(output.bundle.css), Boolean(output.bundle.js));
+                 bundler.write(bundledPath(_dest).replace('.js', '.html'), output.bundled).then(() => {
+                   resolve();
+                 });
+               });
+             });
+            });
+	        }
       }
     }
   }
