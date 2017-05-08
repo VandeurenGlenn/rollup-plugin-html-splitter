@@ -2,9 +2,12 @@
 import { createFilter } from 'rollup-pluginutils';
 import bundler from './bundler';
 import { readFile } from 'fs';
-import { join, dirname, basename } from 'path';
+import { join, dirname, basename, resolve } from 'path';
 
-export default ({bundleHtml = true, include = null, exclude = ['node_modules']}) => {
+export default (options = {}) => {
+  const bundleHtml = options.bundleHtml || true;
+  const include = options.include || null;
+  const exclude = options.exclude || ['node_modules', 'bower_components', 'reload/**/*.js'];
 
   const output = {
     bundle: {},
@@ -27,13 +30,11 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
 		if (css) source = source.replace(/\n(.*)<link rel="stylesheet" href="(.*)">/g, '');
 		source = source.replace(/\n(.*)<link rel="import" href="(.*)">/g, '');
 		if (js) source = source.replace(/\n(.*)<script src="(.*)"><\/script>/g, '');
-
 		return source
 	}
 
   // merge include, exclude
   const filter = createFilter(include, exclude);
-
   let bundled;
   let unbundled;
   let entry;
@@ -58,22 +59,26 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
 
     load(id) {
       // chck if id matches entry
-      if (id === entry) {
-        return new Promise((resolve, reject) => {
-          bundler.split(entry.replace('.js', '.html')).then(bundle => {
-            output.bundle = bundle;
-            resolve(bundle.js)
+      if (filter(resolve(id))) {
+        if (id === entry) {
+          return new Promise((resolve, reject) => {
+            bundler.split(entry.replace('.js', '.html'), include, exclude).then(bundle => {
+              output.bundle = bundle;
+              resolve(bundle.js);
+            });
           });
+        }
+        // checks bundle.scripts for id & return its content
+        return new Promise((resolve, reject) => {
+          if (output.bundle)
+            if (output.bundle.scripts && output.bundle.scripts[id])
+              resolve(output.bundle.scripts[id]);
+            else if (output.bundle.imports && output.bundle.imports[id])
+              resolve(output.bundle.imports[id]);
         });
+      } else {
+        return Promise.resolve(`export default () => {}`);
       }
-      // checks bundle.scripts for id & return its content
-      return new Promise((resolve, reject) => {
-        if (output.bundle)
-          if (output.bundle.scripts && output.bundle.scripts[id])
-            resolve(output.bundle.scripts[id]);
-          else if (output.bundle.imports && output.bundle.imports[id])
-            resolve(output.bundle.imports[id]);
-      });
     },
 
     onwrite(options) {
@@ -95,7 +100,7 @@ export default ({bundleHtml = true, include = null, exclude = ['node_modules']})
                return readFile(options.dest, 'utf-8', (error, contents) => {
                  if (error) reject(error);
                  output.bundled = bundler.bundle({index: output.bundle.index, app: output.bundle.app, css: output.bundle.css, js: contents});
-                 transformIndex(output.bundled, href, Boolean(output.bundle.css), Boolean(output.bundle.js));
+                 output.bundled = transformIndex(output.bundled, href, Boolean(output.bundle.css), Boolean(output.bundle.js));
                  bundler.write(bundledPath(_dest).replace('.js', '.html'), output.bundled).then(() => {
                    resolve();
                  });
