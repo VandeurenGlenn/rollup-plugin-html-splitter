@@ -8,7 +8,7 @@ describe('html-splitter test suite', () => {
     rollup.rollup({
       entry: 'test/templates/index.html',
       plugins: [
-        bundler({})
+        bundler()
       ]
     }).then(function(bundle) {
       bundle.write({
