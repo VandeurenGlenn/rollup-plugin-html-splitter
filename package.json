@@ -1,11 +1,13 @@
 {
   "name": "rollup-plugin-html-bundler",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "main": "lib/bundler-node.js",
   "repository": "https://github.com/VandeurenGlenn/html-bundler.git",
   "author": "Glenn Vandeuren <vandeurenglenn@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "deploy": "npm run build && yarn upgrade && npm publish",
+    "build": "backed -b",
     "test": "mocha"
   },
   "files": [
