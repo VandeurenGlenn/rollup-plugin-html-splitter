@@ -459,11 +459,12 @@ backed-bundler@^0.1.0:
     parse5 "^3.0.2"
 
 backed-splitter@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/backed-splitter/-/backed-splitter-1.4.0.tgz#5c1be581ea7cb037b1b4c46facaefc95bfabf8fa"
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/backed-splitter/-/backed-splitter-1.5.2.tgz#c4914a222dd3ba644474ab26534165ef7a51aae3"
   dependencies:
     backed-utils "^0.0.2"
     dom5 "^2.2.0"
+    micromatch "^2.3.11"
     parse5 "^3.0.2"
 
 backed-utils@^0.0.2:
@@ -477,14 +478,14 @@ backed5-element@^0.1.2:
     parse5 "^3.0.2"
 
 backed@*:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/backed/-/backed-0.3.2.tgz#8bfcbd82714a18851325939a98bedc75d84150f7"
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/backed/-/backed-0.3.4.tgz#a42d340539f7db6fff5a36a2df5273e56e069844"
 
 balanced-match@^0.4.1:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-0.4.2.tgz#cb3f3e3c732dc0f01ee70b403f302e61d7709838"
 
-brace-expansion@^1.0.0:
+brace-expansion@^1.1.7:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.7.tgz#3effc3c50e000531fb720eaff80f0ae8ef23cf59"
   dependencies:
@@ -822,10 +823,10 @@ micromatch@^2.3.11:
     regex-cache "^0.4.2"
 
 minimatch@^3.0.2:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.3.tgz#2a4e4090b96b2db06a9d7df01055a62a77c9b774"
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
   dependencies:
-    brace-expansion "^1.0.0"
+    brace-expansion "^1.1.7"
 
 minimist@0.0.8:
   version "0.0.8"
