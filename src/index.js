@@ -6,8 +6,9 @@ import { join, dirname, basename, resolve } from 'path';
 
 export default (options = {}) => {
   const bundleHtml = options.bundleHtml || true;
-  const include = options.include || null;
-  const exclude = options.exclude || ['node_modules', 'bower_components', 'reload/**/*.js'];
+  let include = options.include || null;
+  let exclude = options.exclude || ['node_modules', 'bower_components', 'reload/**/*.js'];
+  let external = options.external || null;
 
   const output = {
     bundle: {},
@@ -26,10 +27,37 @@ export default (options = {}) => {
     return bundlePath(path, 'unbundled');
   }
 
+  /**
+   * can be a list of strings seperated by comma without withspace
+   */
+  const ensureArray = array => {
+    if (Array.isArray(array)) return array;
+    else if (typeof array === 'string') {
+      if (array.includes(',')) {
+        array = array.split(',');
+        return array;
+      }
+      return `[${array}]`;
+    } else {
+      return [];
+    }
+  }
+
 	const transformIndex = (source, href, css, js) => {
 		if (css) source = source.replace(/\n(.*)<link rel="stylesheet" href="(.*)">/g, '');
 		source = source.replace(/\n(.*)<link rel="import" href="(.*)">/g, '');
 		if (js) source = source.replace(/\n(.*)<script src="(.*)"><\/script>/g, '');
+
+    if (external) {
+      let externals = '';
+      external = ensureArray(external);
+      console.log(external);
+      for (let id of external) {
+        externals += `<link rel="import" href="${id}">\n`;
+      }
+      source = source.replace('</head>', `${externals}
+    </head>`);
+    }
 		return source
 	}
 
@@ -49,8 +77,14 @@ export default (options = {}) => {
       options.entry = entry;
       bundled = options.bundled || true;
       unbundled = options.unbundled || true;
+      options.include = options.include || include;
+      options.exclude = options.exclude || exclude;
+      options.external = options.external || external;
 
-      // return options;
+      include = options.include;
+      exclude = options.exclude;
+      external = options.external;
+      return options;
     },
 
     resolveId(id) {
@@ -87,27 +121,28 @@ export default (options = {}) => {
 				let href = unBundledPath(join(dirname(options.dest), output.bundle.bundleHref));
 	      let _dest = options.dest;
         written = true;
-	        if (unbundled) {
-						options.bundle.write({dest: href.replace('.html', '.js'), format: options.format, moduleName: options.moduleName});
-	        // options.bundle.write(options);
-	          bundler.write(unBundledPath(_dest), output.bundle.index);
-	          bundler.write(href, output.bundle.app);
-	          bundler.write(href.replace('.html', '.css'), output.bundle.css);
-	        }
-					if (bundled) {
-		       return options.bundle.write({dest: options.dest, format: options.format, moduleName: options.moduleName}).then(() => {
-             return new Promise((resolve, reject) => {
-               return readFile(options.dest, 'utf-8', (error, contents) => {
-                 if (error) reject(error);
-                 output.bundled = bundler.bundle({index: output.bundle.index, app: output.bundle.app, css: output.bundle.css, js: contents});
-                 output.bundled = transformIndex(output.bundled, href, Boolean(output.bundle.css), Boolean(output.bundle.js));
-                 bundler.write(bundledPath(_dest).replace('.js', '.html'), output.bundled).then(() => {
-                   resolve();
-                 });
+        if (unbundled) {
+					options.bundle.write({dest: href.replace('.html', '.js'), format: options.format, moduleName: options.moduleName});
+        // options.bundle.write(options);
+          output.bundle.index = transformIndex(output.bundle.index, href, Boolean(output.bundle.css), Boolean(output.bundle.js))
+          bundler.write(unBundledPath(_dest), output.bundle.index);
+          bundler.write(href, output.bundle.app);
+          bundler.write(href.replace('.html', '.css'), output.bundle.css);
+        }
+				if (bundled) {
+	       return options.bundle.write({dest: options.dest, format: options.format, moduleName: options.moduleName}).then(() => {
+           return new Promise((resolve, reject) => {
+             return readFile(options.dest, 'utf-8', (error, contents) => {
+               if (error) reject(error);
+               output.bundled = bundler.bundle({index: output.bundle.index, app: output.bundle.app, css: output.bundle.css, js: contents});
+               output.bundled = transformIndex(output.bundled, href, Boolean(output.bundle.css), Boolean(output.bundle.js));
+               bundler.write(bundledPath(_dest).replace('.js', '.html'), output.bundled).then(() => {
+                 resolve();
                });
              });
-            });
-	        }
+           });
+          });
+        }
       }
     }
   }

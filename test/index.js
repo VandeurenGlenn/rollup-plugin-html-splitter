@@ -7,6 +7,7 @@ describe('html-splitter test suite', () => {
   it('test defaults', done => {
     rollup.rollup({
       entry: 'test/templates/index.html',
+      external: 'bower_components/backed/backed.html,test',
       plugins: [
         bundler()
       ]
