@@ -24,9 +24,9 @@ const write = (dest = null, contents = null) => {
   });
 }
 
-const split = (entry = null, include, exclude) => {
+const split = (entry = null, include, exclude, external) => {
   return new Promise((resolve, reject) => {
-    splitter({entry: entry, exclude: exclude, include: include}).then(bundle => {
+    splitter({entry: entry, exclude: exclude, include: include, external: external}).then(bundle => {
       try {
         for (let path of Object.keys(bundle.scripts)) {
           // write(path, bundle.scripts[path])

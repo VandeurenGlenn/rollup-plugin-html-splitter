@@ -48,12 +48,10 @@ export default (options = {}) => {
 		source = source.replace(/\n(.*)<link rel="import" href="(.*)">/g, '');
 		if (js) source = source.replace(/\n(.*)<script src="(.*)"><\/script>/g, '');
 
-    if (external) {
+    if (output.bundle.external) {
       let externals = '';
-      external = ensureArray(external);
-      console.log(external);
-      for (let id of external) {
-        externals += `<link rel="import" href="${id}">\n`;
+      for (let id of Object.keys(output.bundle.external)) {
+        externals += output.bundle.external[id];
       }
       source = source.replace('</head>', `${externals}
     </head>`);
@@ -83,7 +81,7 @@ export default (options = {}) => {
 
       include = options.include;
       exclude = options.exclude;
-      external = options.external;
+      external = ensureArray(options.external);;
       return options;
     },
 
@@ -96,7 +94,7 @@ export default (options = {}) => {
       if (filter(resolve(id))) {
         if (id === entry) {
           return new Promise((resolve, reject) => {
-            bundler.split(entry.replace('.js', '.html'), include, exclude).then(bundle => {
+            bundler.split(entry.replace('.js', '.html'), include, exclude, external).then(bundle => {
               output.bundle = bundle;
               resolve(bundle.js);
             });
