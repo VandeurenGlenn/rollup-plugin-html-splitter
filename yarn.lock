@@ -445,8 +445,8 @@ babel-types@^6.19.0, babel-types@^6.24.1:
     to-fast-properties "^1.0.1"
 
 babylon@^6.11.0, babylon@^6.15.0:
-  version "6.17.0"
-  resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.17.0.tgz#37da948878488b9c4e3c4038893fa3314b3fc932"
+  version "6.17.1"
+  resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.17.1.tgz#17f14fddf361b695981fe679385e4f1c01ebd86f"
 
 backed-bundler@^0.1.0:
   version "0.1.2"
@@ -459,8 +459,8 @@ backed-bundler@^0.1.0:
     parse5 "^3.0.2"
 
 backed-splitter@^1.4.0:
-  version "1.5.2"
-  resolved "https://registry.yarnpkg.com/backed-splitter/-/backed-splitter-1.5.2.tgz#c4914a222dd3ba644474ab26534165ef7a51aae3"
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/backed-splitter/-/backed-splitter-1.6.0.tgz#34fc71290daaee445832b81862a29ce85230beb8"
   dependencies:
     backed-utils "^0.0.2"
     dom5 "^2.2.0"
