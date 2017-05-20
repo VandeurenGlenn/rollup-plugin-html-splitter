@@ -44,10 +44,11 @@ export default (options = {}) => {
   }
 
 	const transformIndex = (source, href, css, js) => {
-		if (css) source = source.replace(/\n(.*)<link rel="stylesheet" href="(.*)">/g, '');
-		source = source.replace(/\n(.*)<link rel="import" href="(.*)">/g, '');
-		if (js) source = source.replace(/\n(.*)<script src="(.*)"><\/script>/g, '');
-
+		if (href && href !== 'none') {
+      if (css) source = source.replace(/\n(.*)<link rel="stylesheet" href="(.*)">/g, '');
+  		source = source.replace(/\n(.*)<link rel="import" href="(.*)">/g, '');
+  		if (js) source = source.replace(/\n(.*)<script src="(.*)"><\/script>/g, '');
+		}
     if (output.bundle.external) {
       let externals = '';
       for (let id of Object.keys(output.bundle.external)) {
@@ -58,6 +59,15 @@ export default (options = {}) => {
     }
 		return source
 	}
+
+  const transformElement = (source, href, css, js) => {
+    if (css) source = source.replace(/\n(.*)<link rel="stylesheet" href="(.*)">/g, '');
+		source = source.replace(/\n(.*)<link rel="import" href="(.*)">/g, '');
+		if (js) source = source.replace(/\n(.*)<script src="(.*)"><\/script>/g, '');
+    source = source.replace(/<head>/g, '').replace(/<\/head>/g, '');
+    source = source.replace(/<body>/g, '').replace(/<\/body>/g, '');
+    return source;
+  }
 
   // merge include, exclude
   const filter = createFilter(include, exclude);
@@ -117,12 +127,15 @@ export default (options = {}) => {
       // options.dest = options.dest.replace('.html', '.js');
       if (!written) {
 				let href = unBundledPath(join(dirname(options.dest), output.bundle.bundleHref));
+        const isElement = Boolean(output.bundle.bundleHref === 'none');
 	      let _dest = options.dest;
         written = true;
         if (unbundled) {
 					options.bundle.write({dest: href.replace('.html', '.js'), format: options.format, moduleName: options.moduleName});
         // options.bundle.write(options);
-          output.bundle.index = transformIndex(output.bundle.index, href, Boolean(output.bundle.css), Boolean(output.bundle.js))
+          if (!isElement) {
+            output.bundle.index = transformIndex(output.bundle.index, href, Boolean(output.bundle.css), Boolean(output.bundle.js))
+          }
           bundler.write(unBundledPath(_dest), output.bundle.index);
           bundler.write(href, output.bundle.app);
           bundler.write(href.replace('.html', '.css'), output.bundle.css);
@@ -133,7 +146,12 @@ export default (options = {}) => {
              return readFile(options.dest, 'utf-8', (error, contents) => {
                if (error) reject(error);
                output.bundled = bundler.bundle({index: output.bundle.index, app: output.bundle.app, css: output.bundle.css, js: contents});
-               output.bundled = transformIndex(output.bundled, href, Boolean(output.bundle.css), Boolean(output.bundle.js));
+               if (!isElement) {
+                 output.bundled = transformIndex(output.bundled, isElement ? 'none' : href, Boolean(output.bundle.css), Boolean(output.bundle.js));
+               } else {
+                 output.bundled = transformElement(output.bundled, isElement ? 'none' : href, Boolean(output.bundle.css), Boolean(output.bundle.js));
+               }
+              //  console.log(output.bundled);
                bundler.write(bundledPath(_dest).replace('.js', '.html'), output.bundled).then(() => {
                  resolve();
                });

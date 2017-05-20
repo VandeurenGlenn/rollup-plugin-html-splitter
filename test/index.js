@@ -16,13 +16,26 @@ describe('html-splitter test suite', () => {
         format: 'iife',
         moduleName: 'test',
         dest: '.tmp/index.html'
-      }).then(function(result) {
-        done();
-      }).catch((err) => {
-        console.error(err);
+      }).then(result => { done(); })
+      .catch((err) => { console.error(err); })
+    }).catch((err) => { console.error(err); })
+  });
+
+  it('builds element', done => {
+    rollup.rollup({
+      entry: 'test/templates/imported-app.html',
+      external: 'bower_components/backed/backed.html,test',
+      plugins: [
+        bundler()
+      ]
+    }).then(function(bundle) {
+      bundle.write({
+        format: 'iife',
+        moduleName: 'test',
+        dest: '.tmp/imported-app.html'
       })
-    }).catch((err) => {
-      console.error(err);
-    })
+      .then(result => { done(); })
+      .catch(err => { console.error(err); })
+    }).catch(err => { console.error(err); })
   });
 });

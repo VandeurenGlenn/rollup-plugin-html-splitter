@@ -42,10 +42,20 @@ const split = (entry = null, include, exclude, external) => {
 }
 
 /**
+ * wether or not a document contains a 'head' tag, we always use no-quirk mode on app
+ */
+const shouldQuirk = (html, cb) => {
+  return !html.includes('<head>');
+}
+
+/**
  * Bundle html
  */
 const bundle = ({index = null, app = null, js = null, css = null}) => {
-  const bun = _bundle({entry: index, html: app, js: js, css: css})
+  const bun = _bundle({entry: index, html: app, js: js, css: css, element: Boolean(index === null)});
+  if(shouldQuirk(bun)) {
+    return bun;
+  };
   return `<!DOCTYPE html>
   <html>
     ${bun}
