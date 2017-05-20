@@ -448,9 +448,9 @@ babylon@^6.11.0, babylon@^6.15.0:
   version "6.17.1"
   resolved "https://registry.yarnpkg.com/babylon/-/babylon-6.17.1.tgz#17f14fddf361b695981fe679385e4f1c01ebd86f"
 
-backed-bundler@^0.1.0:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/backed-bundler/-/backed-bundler-0.1.2.tgz#e7f60855819a6a8c7302acc3c601298f34f212ed"
+backed-bundler@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/backed-bundler/-/backed-bundler-0.3.1.tgz#f6db601debd1015ddd08237bb5429917d0dfc3c3"
   dependencies:
     backed "*"
     backed5-element "^0.1.2"
@@ -458,9 +458,9 @@ backed-bundler@^0.1.0:
     html-entities "^1.2.1"
     parse5 "^3.0.2"
 
-backed-splitter@^1.4.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/backed-splitter/-/backed-splitter-1.6.0.tgz#34fc71290daaee445832b81862a29ce85230beb8"
+backed-splitter@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/backed-splitter/-/backed-splitter-1.8.0.tgz#d7f7a644e5e48d3b1c2fb8c8e85682fb3a2a9134"
   dependencies:
     backed-utils "^0.0.2"
     dom5 "^2.2.0"
