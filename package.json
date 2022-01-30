@@ -82,7 +82,7 @@
     "backed-splitter": "^1.8.0",
     "dom5": "^2.2.0",
     "parse5": "^3.0.2",
-    "rollup-pluginutils": "^2.0.1"
+    "rollup-pluginutils": "^2.8.2"
   },
   "devDependencies": {
     "mocha": "^3.2.0",
